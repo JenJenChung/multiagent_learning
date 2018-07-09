@@ -1,0 +1,19 @@
+domain:
+  folder: ../Domains/Medium_120_AGVs_baseline/
+graph:
+  vertices: vertices.csv
+  edges: edges.csv
+  capacities: capacities.csv
+neuroevo:
+  learn: false
+  population_size: 10
+  epochs: 200
+  runs: 10
+simulation:
+  steps: 200
+  agvs: origins.csv
+  goals: goals.csv
+results:
+  folder: Results/
+  evaluation: evaluation
+  policies: neural_nets.csv

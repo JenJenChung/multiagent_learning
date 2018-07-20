@@ -1,5 +1,5 @@
 domain:
-  folder: ../Domains/Medium_120_AGVs_link/
+  folder: ../Domains/Medium_60_AGVs_link/
 graph:
   vertices: vertices.csv
   edges: edges.csv

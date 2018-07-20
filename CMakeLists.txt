@@ -38,7 +38,7 @@ set( LIBS_TO_LINK Utilities
 #target_link_libraries( testEigenInverse ${LIBS_TO_LINK} )
 # END: deprecated, required MatrixTypes, UtilFunctions. XY
 
-add_executable(testNeuralNetEigen testNeuralNetEigen.cpp)
+#add_executable(testNeuralNetEigen testNeuralNetEigen.cpp)
 target_link_libraries( testNeuralNetEigen ${LIBS_TO_LINK} )
 
 add_executable(testNeuroEvoEigen testNeuroEvoEigen.cpp)

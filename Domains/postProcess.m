@@ -1,13 +1,15 @@
 clear variables
 close all
 
-c = ['b' 'r'] ;
+c = ['b' 'r' 'g'] ;
 
-for k = 1:2
-    folder = 'Medium_60_AGVs' ;
+for k = 1:3
+    folder = 'Medium_120_AGVs' ;
     if (k == 1)
         domainDir = folder ;
-    elseif (k ==2)
+    elseif (k == 2)
+        domainDir = [folder '_link'] ;
+    elseif (k == 3)
         domainDir = [folder '_baseline'] ;
     end
 

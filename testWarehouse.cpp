@@ -7,6 +7,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include "Domains/Warehouse.h"
+#include "Domains/WarehouseIntersections.h"
+#include "Domains/WarehouseLinks.h"
 #include "threadpool.hpp"
 
 using std::vector ;
@@ -17,7 +19,21 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   srand(r+1); // increment random seed
 
   size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
-  Warehouse * trainDomain = new Warehouse(configs) ;
+  string agentType = configs["simulation"]["agents"].as<string>();
+//  Warehouse * trainDomain = new WarehouseIntersections(configs) ;
+//  trainDomain->InitialiseMATeam() ;
+  Warehouse * trainDomain ;
+  if (agentType.compare("intersection") == 0){
+    trainDomain = new WarehouseIntersections(configs) ;
+  }
+  else if (agentType.compare("link") == 0){
+    trainDomain = new WarehouseLinks(configs) ;
+  }
+  else{
+    std::cout << "ERROR: Currently only configured for 'intersection' or 'link' agents! Exiting.\n" ;
+    exit(1) ;
+  }
+  trainDomain->InitialiseMATeam() ;
   
   int runs = configs["neuroevo"]["runs"].as<int>();
   string domainDir = configs["domain"]["folder"].as<string>() ;
@@ -76,7 +92,7 @@ void WarehouseSimulation(){
   
   int runs = configs["neuroevo"]["runs"].as<int>();
   
-  ThreadPool pool(6) ;
+  ThreadPool pool(4) ;
   
   // Start the runs
   for (int r = 0; r < runs; r++)

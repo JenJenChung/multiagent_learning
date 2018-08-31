@@ -11,7 +11,7 @@ graph:
 neuroevo:
   learn: true
   population_size: 10
-  epochs: 200 # set to 1 in test mode
+  epochs: 500 # set to 1 in test mode
   runs: 30
 simulation:
   steps: 200

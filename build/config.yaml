@@ -3,7 +3,7 @@ mode:
   agent_policies: ../Domains/Small_90_AGVs_baseline/Results/neural_nets.csv # file containing agent policies
   eval_file: ../Domains/Small_90_AGVs_baseline/Results/evaluation_9.csv # file containing best teams
 domain:
-  folder: ../Domains/Small_90_AGVs_SS_link_no_time/
+  folder: ../Domains/Small_120_AGVs_SS_link_no_time/
 graph:
   vertices: vertices.csv
   edges: edges.csv

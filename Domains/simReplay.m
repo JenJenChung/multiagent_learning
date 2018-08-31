@@ -1,7 +1,7 @@
 clear variables
 close all
 
-domainDir = 'Medium_120_AGVs' ;
+domainDir = 'Small_120_AGVs_SS_no_time' ;
 
 verticesFile = [domainDir '/vertices_XY.csv'] ;
 edgesFile = [domainDir '/edges.csv'] ;
@@ -25,7 +25,7 @@ eInd = edges + 1 ;
 xrange = max(nodes(:,1)) - min(nodes(:,1)) ;
 yrange = max(nodes(:,2)) - min(nodes(:,2)) ;
 d = 0.01 ; % separate links in plot
-cbar = 3 ; % per uav on capacity bar
+cbar = 0.5 ; % per uav on capacity bar
 fs = 12 ; % font size
 
 pCap = 1 ;

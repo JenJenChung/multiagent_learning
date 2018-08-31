@@ -1,0 +1,8 @@
+*~
+include*
+*.png
+*.pdf
+*.fig
+build*
+*Results*
+Domains*

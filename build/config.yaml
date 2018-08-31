@@ -1,5 +1,9 @@
+mode:
+  type: train
+  agent_policies: ../Domains/Small_90_AGVs_baseline/Results/neural_nets.csv # file containing agent policies
+  eval_file: ../Domains/Small_90_AGVs_baseline/Results/evaluation_9.csv # file containing best teams
 domain:
-  folder: ../Domains/Medium_120_AGVs_link/
+  folder: ../Domains/Small_90_AGVs_SS_link_no_time/
 graph:
   vertices: vertices.csv
   edges: edges.csv
@@ -7,8 +11,8 @@ graph:
 neuroevo:
   learn: true
   population_size: 10
-  epochs: 200
-  runs: 10
+  epochs: 200 # set to 1 in test mode
+  runs: 30
 simulation:
   steps: 200
   agvs: origins.csv

@@ -1,3 +1,7 @@
+mode:
+  type: train
+#  agent_policies: ../Domains/Medium_60_AGVs/Results/neural_nets.csv # file containing agent policies
+#  eval_file: ../Domains/Medium_60_AGVs/Results/evaluation_9.csv # file containing best teams
 domain:
   folder: ../Domains/Medium_60_AGVs_link/
 graph:
@@ -7,7 +11,7 @@ graph:
 neuroevo:
   learn: true
   population_size: 10
-  epochs: 200
+  epochs: 200 # set to 1 in test mode
   runs: 10
 simulation:
   steps: 200

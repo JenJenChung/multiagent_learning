@@ -1,7 +1,7 @@
 clear variables
 close all
 
-domainDir = 'Small_200_AGVs_SS_intersection_no_time' ;
+domainDir = 'Small_120_AGVs_SS_link_no_time' ;
 
 verticesFile = [domainDir '/vertices_XY.csv'] ;
 edgesFile = [domainDir '/edges.csv'] ;
@@ -11,7 +11,7 @@ origsFile = [domainDir '/origins.csv'] ;
 
 results = [domainDir '/Results'] ;
 
-epochs = 200 ;
+epochs = 500 ;
 runs = 0:9 ;
 
 data = csvread(sprintf('%s/evaluation_%d.csv',results,runs(end))) ;
@@ -20,7 +20,7 @@ data = csvread(sprintf('%s/evaluation_%d.csv',results,runs(end))) ;
 nodes = csvread(verticesFile) ;
 edges = csvread(edgesFile) ;
 caps = csvread(capsFile) ;
-edgeLen = csvread(distsFile) ;
+edgeLen = edges(:,3) ;
 eInd = edges + 1 ;
 xrange = max(nodes(:,1)) - min(nodes(:,1)) ;
 yrange = max(nodes(:,2)) - min(nodes(:,2)) ;
@@ -97,7 +97,7 @@ end
 axis tight ;
 
 team = data(end,1) ; % index of champion team
-fl_epoch = [0,499] ;
+fl_epoch = [0,epochs-1] ;
 tf = 200 ; % number of timesteps per epoch
 j = (tf+1)*team + 1 ; % starting index for champion episode
 

@@ -1,7 +1,7 @@
 clear variables
 close all
 
-n_AGVs = 90 ;
+n_AGVs = 120 ;
 folder = sprintf('Small_%d_AGVs_SS',n_AGVs) ;
 
 figure ;
@@ -10,7 +10,6 @@ c_cell = cell(size(c,1),1) ;
 for i = 1:size(c,1)
     c_cell{i} = c(i,:) ;
 end
-% c = ['b' 'r' 'm' 'c' 'k'] ;
 fa = 0.1 ;
 fs = 12 ;
 l_str = {'Link','Link, time','Intersection','Intersection, time','Centralized', 'Centralized, time'} ;

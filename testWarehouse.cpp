@@ -22,8 +22,9 @@ using namespace Eigen ;
 void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   srand(r+1); // increment random seed
 
+  // Initialise appropriate domain
   size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
-  string agentType = configs["simulation"]["agents"].as<string>();
+  string agentType = configs["domain"]["agents"].as<string>();
   Warehouse * trainDomain ;
   if (agentType.compare("intersection_t") == 0){
     trainDomain = new WarehouseIntersectionsTime(configs) ;
@@ -44,11 +45,12 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
     trainDomain = new WarehouseCentralised(configs) ;
   }
   else{
-    std::cout << "ERROR: Currently only configured for 'intersection' or 'link' agents! Exiting.\n" ;
+    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
     exit(1) ;
   }
   trainDomain->InitialiseMATeam() ;
   
+  // Create results folder
   int runs = configs["neuroevo"]["runs"].as<int>();
   string domainDir = configs["domain"]["folder"].as<string>() ;
   string resFolder = configs["results"]["folder"].as<string>() ;
@@ -60,9 +62,9 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   system(mkdir) ;
   trainDomain->OutputPerformance(eval_str) ;
   
+  // Execute learning episodes of current stat run
   for (size_t n = 0; n < nEps; n++){
-  
-    if (r == runs-1){
+    if (r == runs-1){ // store the first and last episodes of the final stat run for replay
       if (n == 0 || n == nEps-1){
         sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder + "Replay/").c_str()) ;
         system(mkdir) ;
@@ -76,17 +78,19 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
         ss_a_a << domainDir << resFolder << "Replay/agent_actions_" << n << ".csv" ;
         trainDomain->OutputEpisodeReplay(ss_agv_s.str(), ss_agv_e.str(), ss_a_s.str(), ss_a_a.str()) ;
       }
-      else{
+      else{ // do not record domain states if not the final stat run
         trainDomain->DisableEpisodeReplayOutput() ;
       }
     }
     
+    // Main evolution routine for each episode
     std::cout << "Epoch " << n << "...\n" ;
-    trainDomain->EvolvePolicies(n==0) ;
-    trainDomain->ResetEpochEvals() ;
-    trainDomain->SimulateEpoch() ;
+    trainDomain->EvolvePolicies(n==0) ;     // compete (except on first episode), then mutate
+    trainDomain->ResetEpochEvals() ;        // reset domain
+    trainDomain->SimulateEpoch() ;          // simulate
   }
 
+  // Record learned policies of final stat run
   if (r == runs-1){
     string nn_str = domainDir + resFolder + configs["results"]["policies"].as<string>() ;
     std::cout << "Writing control policies to file: " << nn_str << "..." ;
@@ -103,7 +107,8 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
   srand(r+1); // increment random seed
 
-  string agentType = configs["simulation"]["agents"].as<string>();
+  // Initialise appropriate domain
+  string agentType = configs["domain"]["agents"].as<string>();
   Warehouse * testDomain ;
   if (agentType.compare("intersection_t") == 0){
     testDomain = new WarehouseIntersectionsTime(configs) ;
@@ -124,11 +129,12 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
     testDomain = new WarehouseCentralised(configs) ;
   }
   else{
-    std::cout << "ERROR: Currently only configured for 'intersection' or 'link' agents! Exiting.\n" ;
+    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
     exit(1) ;
   }
   testDomain->InitialiseMATeam() ;
   
+  // Create results folder
   int runs = configs["neuroevo"]["runs"].as<int>();
   string domainDir = configs["domain"]["folder"].as<string>() ;
   string resFolder = configs["results"]["folder"].as<string>() ;
@@ -140,6 +146,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
   system(mkdir) ;
   testDomain->OutputPerformance(eval_str) ;
   
+  // Store the final stat run for replay
   if (r == runs-1){
     sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder + "Replay/").c_str()) ;
     system(mkdir) ;
@@ -154,6 +161,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
     testDomain->OutputEpisodeReplay(ss_agv_s.str(), ss_agv_e.str(), ss_a_s.str(), ss_a_a.str()) ;
   }
   
+  // Extract the champion team for execution
   cout << "Reading champion team from file: " ;
   string ev_str = configs["mode"]["eval_file"].as<string>() ;
   ifstream evalFile(ev_str.c_str()) ;
@@ -181,10 +189,12 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
   }
   cout << "complete.\n" ;
   
+  // Simulate
   testDomain->LoadPolicies(configs) ;
   testDomain->ResetEpochEvals() ;
   testDomain->SimulateEpoch(team) ;
 
+  // Store the control policies in the same test results folder
   if (r == runs-1){
     string nn_str = domainDir + resFolder + configs["results"]["policies"].as<string>() ;
     std::cout << "Writing control policies to file: " << nn_str << "..." ;
@@ -198,45 +208,28 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
   std::cout << "Testing complete!\n" ;
 }
 
-void WarehouseSimulation(){
-  string config_file = "config.yaml";
+void WarehouseSimulation(string config_file, int thrds){
+  std::cout << "Reading configuration file: " << config_file << "\n" ;
+  
   YAML::Node configs = YAML::LoadFile(config_file);
   
   string mode = configs["mode"]["type"].as<string>() ;
   int runs = configs["neuroevo"]["runs"].as<int>();
-  ThreadPool pool(6) ;
+  ThreadPool pool(thrds) ;
   
   if (mode.compare("train") == 0){
-    // Start the runs
+    // Start the training runs
     for (int r = 0; r < runs; r++)
     {
       pool.schedule(std::bind(WarehouseSimulationSingleRun, r, configs));
     }
-//    for (int r = 0; r < runs; r++){
-//      WarehouseSimulationSingleRun(r, configs) ;
-//    }
   }
   else if (mode.compare("test") == 0){
-//    // Start the runs
-//    for (int r = 0; r < runs; r++)
-//    {
-//      pool.schedule(std::bind(WarehouseSimulationTestSingleRun, r, configs));
-//    }
-    for (int r = 0; r < runs; r++){
-      WarehouseSimulationTestSingleRun(r, configs) ;
+    // Start the testing runs
+    for (int r = 0; r < runs; r++)
+    {
+      pool.schedule(std::bind(WarehouseSimulationTestSingleRun, r, configs));
     }
-//    Warehouse * testDomain = new Warehouse(configs) ;
-//    testDomain->ExecutePolicies(configs) ;
-//    
-//    string domainDir = configs["domain"]["folder"].as<string>() ;
-//    string resFolder = configs["results"]["folder"].as<string>() ;
-//    string nn_str = domainDir + resFolder + "neural_nets_check.txt" ;
-//    std::cout << "Writing control policies to file: " << nn_str << "...\n" ;
-//    testDomain->OutputControlPolicies(nn_str) ;
-//    std::cout << "Test execution complete.\n" ;
-//    
-//    delete testDomain ;
-//    testDomain = 0 ;
   }
   else{
     std::cout << "Error: unknown mode! Exiting.\n" ;
@@ -244,9 +237,60 @@ void WarehouseSimulation(){
   }
 }
 
-int main(){
+static void show_usage(std::string name)
+{
+    std::cerr << "Usage: " << name << " -c CONFIG_FILE <options>\n"
+              << "options:\n"
+              << "\t-h, --help\t\t\tShow this help message\n"
+              << "\t-c, --config CONFIG_FILE_DIR\tSpecify the configuration file path\n"
+              << "\t-t, --threads N_THREADS\t\tSpecify the number of parallel threads (default: 2)"
+              << std::endl;
+}
+
+int main(int argc, char* argv[]){
+  if (argc < 3){
+    show_usage(argv[0]) ;
+    return 0 ;
+  }
   
-  WarehouseSimulation() ;
+  string config_file ;
+  int thrds = 2 ; // Default number of threads
+  for (int i = 1; i < argc; ++i){
+    string arg = argv[i] ;
+    
+    // Display help
+    if ((arg == "-h") || (arg == "--help")){
+      show_usage(argv[0]) ;
+      return 0 ;
+    }
+    // Path to configuration file
+    else if ((arg == "-c") || (arg == "--config")){
+      if (i + 1 < argc) {
+        config_file = argv[++i] ;
+      }
+      else {
+        std::cerr << "--config option requires one argument.\n" ;
+        return 1 ;
+      }
+    }
+    // Number of parallel threads
+    else if ((arg == "-t") || (arg == "--threads")){
+      if (i + 1 < argc) {
+        thrds = atoi(argv[++i]) ;
+        std::cout << "Using " << thrds << " threads.\n" ;
+      }
+      else {
+        std::cout << "Using default 2 threads for parallel compute.\n" ;
+      }
+    }
+    // Unknown input
+    else {
+      std::cerr << "Unknown option " << arg << ". Exiting.\n" ;
+      return 1 ;
+    }
+  }
+  
+  WarehouseSimulation(config_file, thrds) ;
   
   return 0 ;
 }

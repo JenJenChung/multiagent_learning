@@ -1,7 +1,7 @@
 clear variables
 close all
 
-domainDir = 'Small_120_AGVs_SS_no_time' ;
+domainDir = 'Small_200_AGVs_SS_intersection_no_time' ;
 
 verticesFile = [domainDir '/vertices_XY.csv'] ;
 edgesFile = [domainDir '/edges.csv'] ;
@@ -97,7 +97,7 @@ end
 axis tight ;
 
 team = data(end,1) ; % index of champion team
-fl_epoch = [0,199] ;
+fl_epoch = [0,499] ;
 tf = 200 ; % number of timesteps per epoch
 j = (tf+1)*team + 1 ; % starting index for champion episode
 

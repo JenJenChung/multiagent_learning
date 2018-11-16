@@ -11,7 +11,6 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads)
 
 include_directories( ${Boost_INCLUDE_DIRS} )
-
 include_directories(include)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -29,14 +28,6 @@ set( LIBS_TO_LINK Utilities
                   Planning
                   yaml-cpp
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
-
-# START: deprecated, required MatrixTypes, UtilFunctions. XY
-#add_executable(testBinaryIO testBinaryIO.cpp
-#target_link_libraries( testBinaryIO ${LIBS_TO_LINK} )
-
-#add_executable(testEigenInverse testEigenInverse.cpp)
-#target_link_libraries( testEigenInverse ${LIBS_TO_LINK} )
-# END: deprecated, required MatrixTypes, UtilFunctions. XY
 
 add_executable(testNeuralNetEigen testNeuralNetEigen.cpp)
 target_link_libraries( testNeuralNetEigen ${LIBS_TO_LINK} )

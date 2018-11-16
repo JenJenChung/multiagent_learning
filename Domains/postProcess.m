@@ -1,7 +1,8 @@
 clear variables
 close all
 
-folder = 'Small_90_AGVs_SS' ;
+n_AGVs = 90 ;
+folder = sprintf('Small_%d_AGVs_SS',n_AGVs) ;
 
 figure ;
 c = get(gca,'colororder') ;
@@ -14,7 +15,7 @@ fa = 0.1 ;
 fs = 12 ;
 l_str = {'Link','Link, time','Intersection','Intersection, time','Centralized', 'Centralized, time'} ;
 
-epochs = 200 ;
+epochs = 500 ;
 runs = 0:29 ;
 
 n_fac = numel(l_str) ;
@@ -71,7 +72,7 @@ for k = p_res
     pasigG(k) = patch([1:epochs,epochs:-1:1],[meanG+sigG,fliplr(meanG-sigG)],c(k,:),...
         'facealpha',fa, 'linestyle','none') ;
     plMeanG(k) = plot(1:epochs,meanG,'color',c(k,:)) ;
-    title('Learning Performance (mean and standard deviation)','interpreter','latex','fontsize',fs)
+    title(sprintf('Learning Performance, %d AGVs $\\left(\\mu, \\sigma\\right)$',n_AGVs),'interpreter','latex','fontsize',fs)
     xlabel('Learning epoch','interpreter','latex','fontsize',fs)
     ylabel('Total number of deliveries','interpreter','latex','fontsize',fs)
     set(gca,'ticklabelinterpreter','latex','fontsize',fs)
@@ -119,7 +120,7 @@ for k = p_res
     hold on
     maxG = max(G,[],2) ;
     plMaxG(k) = plot(1:epochs,maxG,'color',c(k,:)) ;
-    title('Learning Performance (max)','interpreter','latex','fontsize',fs)
+    title(sprintf('Learning Performance, %d AGVs (max)',n_AGVs),'interpreter','latex','fontsize',fs)
     xlabel('Learning epoch','interpreter','latex','fontsize',fs)
     ylabel('Total number of deliveries','interpreter','latex','fontsize',fs)
     set(gca,'ticklabelinterpreter','latex','fontsize',fs)
@@ -142,15 +143,17 @@ figure(6)
 addpath('~/Documents/MATLAB/distributionPlot') ;
 addpath('~/Documents/MATLAB/rotateticklabel') ;
 hd = distributionPlot(final_G(p_res,:)','xNames',l_str(p_res),'color',c_cell) ;
+set(gca,'ylim',[0 1100])
 ht = rotateticklabel(gca,45);
 for i = 1:numel(ht)
     set(ht(i),'interpreter','latex','fontsize',fs)
 end
 dataObj = get(gca,'children') ;
-set(dataObj(7),'color','k');
+set(dataObj(7),'color','k','marker','x');
 set(dataObj(8),'color','k');
-title('Final Team Performance','interpreter','latex','fontsize',fs)
+title(sprintf('Final Team Performance (%d AGVs)',n_AGVs),'interpreter','latex','fontsize',fs)
 ylabel('Total number of deliveries','interpreter','latex','fontsize',fs)
 set(gca,'ticklabelinterpreter','latex','fontsize',fs)
 set(6,'position',[350 100 560 470])
-set(gca,'position',[0.1300 0.2380 0.7750 0.670])
+set(gca,'position',[0.1300 0.1960 0.7750 0.730])
+legend(dataObj(7:8),{'median','mean'},'location','southeast','interpreter','latex','fontsize',fs)

@@ -2,7 +2,7 @@
 
 #include "Learning/MAPElites.h"
 #include "Learning/NeuralNet.h"
-#include "Utilities/UtilFunctions.h"
+#include "Utilities/Utilities.h"
 
 using easymath::rand_interval ;
 using easymath::sum ;

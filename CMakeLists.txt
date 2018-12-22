@@ -8,14 +8,18 @@ project(test_includes)
 #include_directories( ${Boost_INCLUDE_DIRS} )
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-find_package(Threads)
+find_package(Threads REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
-include_directories( ${Boost_INCLUDE_DIRS} )
-include_directories(include)
+include_directories( ${Boost_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
+  ${yaml-cpp_INCLUDE_DIR}
+  include)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-g -Wall -I /usr/local/include/eigen3/")
+#set(CMAKE_CXX_FLAGS "-g -Wall -I /usr/local/include/eigen3/")
 add_subdirectory(include)
 
 #link_directories(libraries)

@@ -62,6 +62,9 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   system(mkdir) ;
   trainDomain->OutputPerformance(eval_str) ;
   
+  // Check if agent failure is to be simulated
+  size_t failureEpoch = configs["simulation"]["failure_epoch"].as<size_t>() ;
+  
   // Execute learning episodes of current stat run
   for (size_t n = 0; n < nEps; n++){
     if (r == runs-1){ // store the first and last episodes of the final stat run for replay
@@ -87,7 +90,13 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
     std::cout << "Epoch " << n << "...\n" ;
     trainDomain->EvolvePolicies(n==0) ;     // compete (except on first episode), then mutate
     trainDomain->ResetEpochEvals() ;        // reset domain
-    trainDomain->SimulateEpoch() ;          // simulate
+    if (n < failureEpoch){
+      trainDomain->SimulateEpoch(false) ;        // simulate
+    }
+    else{
+      std::cout << "Simulating agent failure.\n" ;
+      trainDomain->SimulateEpoch(true) ;    // simulate with failed agents
+    }
   }
 
   // Record learned policies of final stat run

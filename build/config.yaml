@@ -4,8 +4,8 @@ mode:
   agent_policies: ../Domains/Small_120_AGVs_SS_link_time/Results/neural_nets.csv # file containing agent policies
   eval_file: ../Domains/Small_120_AGVs_SS_link_time/Results/evaluation_29.csv # file containing best teams
 domain:
-  folder: ../Domains/Small_120_AGVs_SS_intersection_no_time_fail_2/
-  agents: intersection
+  folder: ../Domains/Small_120_AGVs_SS_link_time_fail_1/
+  agents: link_t
 graph:
   vertices: vertices.csv
   edges: edges.csv
@@ -20,7 +20,7 @@ simulation:
   agvs: origins.csv
   goals: goals.csv
   failure_epoch: 200 # set to neuroevo:epochs to disable
-  failed: [2]
+  failed: [1]
 results:
   folder: Results/
   evaluation: evaluation
